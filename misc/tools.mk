@@ -4,13 +4,13 @@ KLAYOUT			= $(KLAYOUT_EXE) $(KLAYOUT_ARGS)
 KLAYOUT_CLI     = $(KLAYOUT) -b -zz
 
 XSCHEM_EXE		= $(shell command -v xschem)
-XSCHEM_ARGS     = --rcfile $(PDK_ROOT)/$(PDK)/libs.tech/xschem/xschemrc
+XSCHEM_ARGS     = --rcfile $(realpath misc/xschemrc)
 XSCHEM          = $(XSCHEM_EXE) $(XSCHEM_ARGS)
 
 TOP_GDS         ?= $(realpath $(TOP)/$(TOP).gds)
 TOP_SCH         ?= $(realpath $(TOP)/$(TOP).sch)
-TOP_SPICE       ?= $(abspath  $(TOP)/$(TOP).spice)
-TOP_SCRIPT      ?= $(realpath $(TOP)/$(TOP).py)
+TOP_SPICE       ?= $(abspath $(TOP)/$(TOP).spice)
+TOP_SCRIPT      ?= $(abspath $(TOP)/$(TOP).py)
 
 export SPICE_USERINIT_DIR ?= $(PDK_ROOT)/$(PDK)/libs.tech/ngspice
 
@@ -71,6 +71,24 @@ xschem-lvs-noprefix:
 xschem-lvs: xschem-lvs-noprefix
 
 
+xschem-create:
+ifeq (,$(realpath $(TOP_SCH)))
+	$(XSCHEM_EXE) \
+	--no_x \
+	--quit \
+	--command "xschem clear; xschem saveas $(TOP_SCH)"
+endif
+
+
+xschem-tb-create:
+ifeq (,$(realpath $(TOP)))
+	$(XSCHEM_EXE) \
+	--no_x \
+	--quit \
+	--command "xschem clear; xschem saveas $(TOP)"
+endif
+
+
 #-------------------------------------------------------------------------------
 # klayout           Open module gds with klayout
 # klayout-script    Run python script
@@ -113,7 +131,7 @@ klayout-lvs:
 		--netlist=$(TOP_SPICE) \
 		--topcell=$(TOP) \
 		--run_mode=flat \
-		--run_dir=./tmp/ \
+		--run_dir=$(TMP_DIR)/$(TOP) \
 		--verbose
 
 
@@ -124,10 +142,10 @@ klayout-lvs-gui:
 		--netlist=$(TOP_SPICE) \
 		--topcell=$(TOP) \
 		--run_mode=flat \
-		--run_dir=./tmp/ \
+		--run_dir=$(TMP_DIR)/$(TOP) \
 		--verbose
 
-	$(KLAYOUT) $(TOP)/$(TOP).gds -mn ./tmp/$(TOP).lvsdb
+	$(KLAYOUT) $(TOP)/$(TOP).gds -mn $(TMP_DIR)/$(TOP)/$(TOP).lvsdb
 
 # in_gds                 path to the GDS layout to check (required in batch mode)
 # cell                   name of the cell to check
@@ -143,8 +161,8 @@ klayout-lvs-gui:
 klayout-drc:
 	$(KLAYOUT_CLI) -r $(PDK_ROOT)/$(PDK)/libs.tech/klayout/tech/drc/sg13g2_maximal.lydrc \
 		-rd in_gds=$(TOP_GDS) \
-		-rd log_file=./tmp/$(TOP)_drc.log \
-		-rd report_file=./tmp/$(TOP).lyrdb \
+		-rd log_file=$(TMP_DIR)/$(TOP)/$(TOP)_drc.log \
+		-rd report_file=$(TMP_DIR)/$(TOP)/$(TOP).lyrdb \
 		-rd offGrid=true \
 		-rd density=false \
 		-rd filler=true \
@@ -156,8 +174,8 @@ klayout-drc:
 klayout-drc-gui:
 	$(KLAYOUT_CLI) -r $(PDK_ROOT)/$(PDK)/libs.tech/klayout/tech/drc/sg13g2_maximal.lydrc \
 		-rd in_gds=$(TOP_GDS) \
-		-rd log_file=./tmp/$(TOP)_drc.log \
-		-rd report_file=./tmp/$(TOP).lyrdb \
+		-rd log_file=$(TMP_DIR)/$(TOP)/$(TOP)_drc.log \
+		-rd report_file=$(TMP_DIR)/$(TOP)/$(TOP).lyrdb \
 		-rd offGrid=true \
 		-rd density=false \
 		-rd filler=true \
@@ -165,15 +183,15 @@ klayout-drc-gui:
 		-rd sanityRules=true \
 		-rd checkDensityRules=true
 
-	$(KLAYOUT) $(TOP)/$(TOP).gds -m ./tmp/$(TOP).lyrdb
+	$(KLAYOUT) $(TOP)/$(TOP).gds -m $(TMP_DIR)/$(TOP)/$(TOP).lyrdb
 
 
 klayout-drc-full:
 	$(KLAYOUT_CLI) -r $(PDK_ROOT)/$(PDK)/libs.tech/klayout/tech/drc/sg13g2_maximal.lydrc \
 		-rd in_gds=$(TOP_GDS) \
 		-rd cell=$(TOP) \
-		-rd log_file=./tmp/$(TOP)_drc.log \
-		-rd report_file=./tmp/$(TOP).lyrdb \
+		-rd log_file=$(TMP_DIR)/$(TOP)/$(TOP)_drc.log \
+		-rd report_file=$(TMP_DIR)/$(TOP)/$(TOP).lyrdb \
 		-rd offGrid=true \
 		-rd density=false \
 		-rd filler=true \
@@ -181,4 +199,4 @@ klayout-drc-full:
 		-rd sanityRules=true \
 		-rd checkDensityRules=true
 	
-	$(KLAYOUT) $(TOP)/$(TOP).gds -m ./tmp/$(TOP).lyrdb
+	$(KLAYOUT) $(TOP)/$(TOP).gds -m $(TMP_DIR)/$(TOP)/$(TOP).lyrdb

@@ -68,6 +68,6 @@ C {devices/lab_pin.sym} -570 50 0 0 {name=p1 sig_type=std_logic lab=in}
 C {devices/lab_pin.sym} -120 50 2 0 {name=p2 sig_type=std_logic lab=out}
 C {devices/lab_pin.sym} -640 90 0 0 {name=p3 sig_type=std_logic lab=VDD
 }
-C {inv.sym} -270 50 0 0 {name=x1}
 C {devices/lab_pin.sym} -270 0 0 0 {name=p4 sig_type=std_logic lab=VDD
 }
+C {buffer.sym} -270 50 0 0 {name=x1}

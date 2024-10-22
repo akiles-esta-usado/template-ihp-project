@@ -4,7 +4,7 @@ MAKEFLAGS += --no-builtin-rules
 
 #-------------------------------------------------------------------------------
 # Default target when invoking without specific target.
-.DEFAULT_GOAL := finish
+.DEFAULT_GOAL := print
 
 #-------------------------------------------------------------------------------
 # Proper way to initiate SHELL for make
