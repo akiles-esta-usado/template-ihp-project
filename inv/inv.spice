@@ -1,0 +1,7 @@
+** sch_path: /workspaces/Workshop-CANELOS24/tapeout/template-ihp-project/inv/inv.sch
+.subckt inv vdd vss in out
+*.PININFO vdd:B vss:B in:I out:O
+M1 out in vss vss sg13_hv_nmos l=0.22u w=5u ng=1 m=54
+M2 out in vdd vdd sg13_hv_pmos l=0.22u w=5u ng=1 m=54
+.ends
+.end
